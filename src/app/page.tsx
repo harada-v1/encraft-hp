@@ -26,161 +26,178 @@ export default async function Home() {
                 colors={['#1A1A1B', '#3B82F6', '#94A3B8']}
             />
 
-            {/* Section 1: Philosophy / Mission */}
-            <section className="w-full py-24 bg-white">
+            {/* Section 1: Quick Guide */}
+            <section id="guide" className="w-full py-20 bg-white">
                 <div className="max-w-4xl mx-auto px-6 text-center space-y-12">
-                    <div className="space-y-8">
-                        <div>
-                            <span className="text-blue-600 font-semibold tracking-widest uppercase text-sm block mb-6">Our Philosophy</span>
-                            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-                                重力を、<br className="md:hidden" />エネルギーに変える。
-                            </h2>
+                    <div className="space-y-4">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">あなたの中の「重力」を、手放す。</h2>
+                        <p className="text-gray-500">わずか3ステップで、心に実体と軽さを取り戻す体験。</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                        <div className="space-y-3">
+                            <div className="text-blue-600 font-bold text-xl">01. Write</div>
+                            <p className="text-sm text-gray-600 leading-relaxed">今この瞬間の思考、迷い、希望。心にあるものを書き出します。</p>
                         </div>
-                        <div className="space-y-8">
-                            <p className="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
-                                日々感じるプレッシャーやストレス。それは目に見えない「重り」です。<br />
-                                私たちはそれをただ耐えるのではなく、投げて、可視化し、<br />
-                                新たな推進力（アンチグラビティ）へと変換する技術を探求しています。
-                            </p>
-                            <p className="text-xl font-medium text-gray-900">
-                                投げられた「声」から、本質的なプロダクトを作る。
-                            </p>
+                        <div className="space-y-3">
+                            <div className="text-blue-600 font-bold text-xl">02. Throw</div>
+                            <p className="text-sm text-gray-600 leading-relaxed">ボタンを押し、それらを「重力を持つボール」として放ちます。</p>
+                        </div>
+                        <div className="space-y-3">
+                            <div className="text-blue-600 font-bold text-xl">03. Release</div>
+                            <p className="text-sm text-gray-600 leading-relaxed">指先を離れた瞬間、それはあなたを前へ進めるエネルギーに変わります。</p>
                         </div>
                     </div>
-
-                    {/* Visual separator line */}
-                    <div className="w-px h-24 bg-gradient-to-b from-blue-600/0 via-blue-600/50 to-blue-600/0 mx-auto" />
                 </div>
             </section>
 
-            {/* Section 2: Value / Mechanism */}
-            <section className="w-full py-24 bg-gray-50">
-                <div className="max-w-6xl mx-auto px-6 space-y-12">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Card 1 */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">01</div>
-                            <h3 className="text-xl font-bold text-gray-900">Visualize</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed">
-                                見えないストレスをデジタルの球体として実体化。
-                                客観視することで、心にかかる負荷の輪郭を捉えます。
-                            </p>
-                            <div className="h-32 bg-gray-100 rounded-lg w-full animate-pulse mt-4" />
-                        </div>
-
-                        {/* Card 2 */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">02</div>
-                            <h3 className="text-xl font-bold text-gray-900">Release</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed">
-                                物理演算を用いた「投げる」アクション。
-                                溜め込んだ感情を指先から解き放つ、カタルシスある体験を提供します。
-                            </p>
-                            <div className="h-32 bg-gray-100 rounded-lg w-full animate-pulse mt-4" />
-                        </div>
-
-                        {/* Card 3 */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">03</div>
-                            <h3 className="text-xl font-bold text-gray-900">Transform</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed">
-                                集まったデータは集合知となり、組織や社会の課題解決へ。
-                                個人の「重力」が、社会を動かす「エネルギー」に変わります。
-                            </p>
-                            <div className="h-32 bg-gray-100 rounded-lg w-full animate-pulse mt-4" />
-                        </div>
-                    </div>
-
-                    {/* Privacy Note */}
-                    <p className="text-center text-xs text-gray-400">
-                        ※ 投稿された内容は統計的に処理され、個人が特定される形で公開されることはありません。安心してお使いください。
-                    </p>
-                </div>
-            </section>
-
-            {/* Section 3: Product / LP Hub */}
-            <section className="w-full py-24 bg-white">
+            {/* Section 2: Products */}
+            <section id="products" className="w-full py-24 bg-gray-50 scroll-mt-20">
                 <div className="max-w-6xl mx-auto px-6 space-y-12">
                     <div className="text-center space-y-4">
-                        <span className="text-blue-600 font-semibold tracking-widest uppercase text-sm">Products</span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Our Solutions</h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto">
-                            皆様の「声」から生まれたプロジェクトたち。
-                        </p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">浮き上がった「声」から、形にする。</h2>
+                        <p className="text-gray-600 max-w-2xl mx-auto">放たれた思考は、AIと共に具体的な価値へと昇華されます。</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Product 1: Idea Stocker */}
-                        <div className="group relative bg-gray-50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
-                            <div className="h-48 bg-gray-200 w-full" />
-                            <div className="p-8 space-y-4">
-                                <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">Idea Stocker</h3>
-                                <p className="text-gray-600 text-sm">
-                                    その瞬間のひらめきを逃さない。<br />
-                                    AIが壁打ち相手になる、次世代メモアプリ。
+                        <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-500">
+                            <div className="space-y-6">
+                                <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                </div>
+                                <h3 className="text-2xl font-bold text-gray-900">Idea Stocker</h3>
+                                <p className="text-gray-600 text-sm leading-relaxed">
+                                    ストレスをアイデアへ変換し、AIがあなたの思考の壁打ち相手になる。未整理の断片から、次のアクションを導き出します。
                                 </p>
-                                <div className="pt-4 flex items-center text-blue-600 font-medium text-sm">
-                                    View Details →
+                                <div className="pt-4 flex items-center text-blue-600 font-semibold group-hover:translate-x-2 transition-transform">
+                                    使ってみる →
                                 </div>
                             </div>
                         </div>
 
                         {/* Product 2: Story Stocker */}
-                        <div className="group relative bg-gray-50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
-                            <div className="h-48 bg-gray-200 w-full" />
-                            <div className="p-8 space-y-4">
-                                <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">Story Stocker</h3>
-                                <p className="text-gray-600 text-sm">
-                                    物語の種を育てよう。<br />
-                                    クリエイターのための構成・執筆支援ツール。
+                        <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-500">
+                            <div className="space-y-6">
+                                <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600">
+                                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                                </div>
+                                <h3 className="text-2xl font-bold text-gray-900">Story Stocker</h3>
+                                <p className="text-gray-600 text-sm leading-relaxed">
+                                    膨大な思考の断片から、一つの「物語」を紡ぎ出す。クリエイターのための次世代プロット・執筆支援ツール。
                                 </p>
-                                <div className="pt-4 flex items-center text-blue-600 font-medium text-sm">
-                                    View Details →
+                                <div className="pt-4 flex items-center text-purple-600 font-semibold group-hover:translate-x-2 transition-transform">
+                                    使ってみる →
                                 </div>
                             </div>
                         </div>
 
-                        {/* Product 3: Coming Soon */}
-                        <div className="group relative bg-gray-50 rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 hover:border-blue-200 transition-all duration-300 opacity-80">
-                            <div className="h-48 bg-gray-100 w-full flex items-center justify-center text-gray-300 font-bold text-3xl">
-                                ?
+                        {/* Coming Soon */}
+                        <div className="bg-gray-100/50 p-8 rounded-3xl border-2 border-dashed border-gray-200 flex flex-col justify-center items-center text-center space-y-4">
+                            <div className="text-gray-400 font-bold text-xl">Next Solution</div>
+                            <p className="text-gray-400 text-xs">皆様の思考の種から、<br />新しい道具を開発中です。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Section 3: Use Case */}
+            <section id="use-case" className="w-full py-24 bg-white">
+                <div className="max-w-4xl mx-auto px-6 space-y-16">
+                    <div className="text-center space-y-4">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">こんな「瞬間」に、触れてみる。</h2>
+                        <p className="text-gray-500">思考が止まったとき、Antigravityはあなたの味方になります。</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="flex gap-4 p-6 rounded-2xl hover:bg-gray-50 transition-colors">
+                            <span className="text-2xl">🧩</span>
+                            <div>
+                                <h4 className="font-bold text-gray-900">迷いを整理したい時</h4>
+                                <p className="text-sm text-gray-600">答えの出ない問いを一度手放し、客観的に眺めることで視点が変わります。</p>
                             </div>
-                            <div className="p-8 space-y-4">
-                                <h3 className="text-xl font-bold text-gray-400">Next Product</h3>
-                                <p className="text-gray-400 text-sm">
-                                    現在、皆様のストレスデータから<br />
-                                    新しいソリューションを開発中です。
-                                </p>
-                                <div className="pt-4 flex items-center text-gray-400 font-medium text-sm uppercase tracking-wider">
-                                    Coming Soon
-                                </div>
+                        </div>
+                        <div className="flex gap-4 p-6 rounded-2xl hover:bg-gray-50 transition-colors">
+                            <span className="text-2xl">✨</span>
+                            <div>
+                                <h4 className="font-bold text-gray-900">壮大な夢を描く時</h4>
+                                <p className="text-sm text-gray-600">まだ形にならない希望をボールに乗せ、未来への期待を膨らませます。</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-4 p-6 rounded-2xl hover:bg-gray-50 transition-colors">
+                            <span className="text-2xl">🛑</span>
+                            <div>
+                                <h4 className="font-bold text-gray-900">足が止まった時</h4>
+                                <p className="text-sm text-gray-600">タスクや不安に押し潰されそうな時、物理的に「投げる」ことでリセットします。</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-4 p-6 rounded-2xl hover:bg-gray-50 transition-colors">
+                            <span className="text-2xl">🧠</span>
+                            <div>
+                                <h4 className="font-bold text-gray-900">アイデアが煮詰まった夜に</h4>
+                                <p className="text-sm text-gray-600">既存の枠組みを一度壊し、空っぽになった心に新しい風を吹き込みます。</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Section 4: Company Profile */}
-            <section className="w-full py-24 bg-white border-t border-gray-100">
-                <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start gap-12">
-                    <div className="space-y-4">
-                        <h4 className="text-2xl font-bold text-gray-900">Antigravity Inc.</h4>
-                        <p className="text-gray-500 text-sm">
-                            〒100-0000<br />東京都渋谷区...
-                        </p>
+            {/* Section 4: Philosophy */}
+            <section id="philosophy" className="w-full py-32 bg-gray-900 text-white overflow-hidden relative">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-blue-600/10 blur-[120px] rounded-full -z-0" />
+                <div className="max-w-4xl mx-auto px-6 relative z-10 text-center space-y-12">
+                    <div className="space-y-6">
+                        <h2 className="text-4xl md:text-5xl font-bold leading-tight">重力を、推進力へ。</h2>
+                        <div className="h-1 w-20 bg-blue-500 mx-auto" />
                     </div>
-                    <div className="space-y-2 text-right md:text-left">
-                        <div className="flex gap-4 text-sm font-medium text-gray-600">
-                            <a href="#" className="hover:text-blue-600">About Us</a>
-                            <a href="#" className="hover:text-blue-600">Services</a>
-                            <a href="#" className="hover:text-blue-600">Contact</a>
-                        </div>
-                        <p className="text-xs text-gray-400 mt-8">
-                            © 2026 Antigravity Inc. All rights reserved.
+                    <div className="space-y-8 text-gray-300 text-lg leading-relaxed text-left md:text-center">
+                        <p>
+                            私たちは、心にかかる負荷や迷いを「重力」と呼んでいます。ストレスはその一例に過ぎません。
+                        </p>
+                        <p>
+                            頭の中にあるだけでは、重力はあなたを停滞させます。しかし、それを実体化し、自分から切り離して眺めることで、それはあなたを前へ進める「推進力」へと変換可能です。
+                        </p>
+                        <p className="text-white font-medium italic">
+                            「内面の重化を、軽やかな進化へ。」
                         </p>
                     </div>
                 </div>
             </section>
+
+            {/* Section 5: FAQ */}
+            <section id="faq" className="w-full py-24 bg-white">
+                <div className="max-w-3xl mx-auto px-6 space-y-12">
+                    <h2 className="text-3xl font-bold text-center text-gray-900">よくあるご質問</h2>
+                    <div className="space-y-8">
+                        <div className="space-y-2">
+                            <h4 className="font-bold text-gray-900">Q: どのような内容を書き込めばいいですか？</h4>
+                            <p className="text-gray-600 text-sm">A: ストレスはもちろん、アイデア、悩み、希望など、あなたの中にある未整理な思考を何でも受け止めます。</p>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-bold text-gray-900">Q: 私が投げた「思考」はどうなりますか？</h4>
+                            <p className="text-gray-600 text-sm">A: 投げられた瞬間、それは匿名データに変換されます。画面上で誰かに見られることはなく、Antigravityが新しいツールを作るためのエネルギーとして活用されます。</p>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-bold text-gray-900">Q: なぜ「投げる」必要があるのですか？</h4>
+                            <p className="text-gray-600 text-sm">A: 頭の中にある「重り」を外に出して、物理的に動く様子を眺めることで、自分を客観視し、心の軽さを取り戻す体験を大切にしているからです。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="w-full py-20 bg-gray-50 border-t border-gray-100">
+                <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div className="space-y-2 text-center md:text-left">
+                        <h4 className="text-xl font-bold text-gray-900 tracking-tight">Antigravity Inc.</h4>
+                        <p className="text-gray-400 text-xs">重力をエネルギーに。未整理な思考を力に変える。</p>
+                    </div>
+                    <div className="flex gap-8 text-sm text-gray-500">
+                        <a href="#" className="hover:text-blue-600 transition-colors">Philosophy</a>
+                        <a href="#" className="hover:text-blue-600 transition-colors">Products</a>
+                        <a href="#" className="hover:text-blue-600 transition-colors">Privacy</a>
+                    </div>
+                    <p className="text-xs text-gray-400">© 2026 Antigravity Inc. All rights reserved.</p>
+                </div>
+            </footer>
         </main>
     );
 }

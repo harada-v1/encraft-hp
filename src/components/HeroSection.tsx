@@ -246,10 +246,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const physicsRef = useRef<PhysicsWorld | null>(null);
     const imeshRef = useRef<THREE.InstancedMesh | null>(null);
+    const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+    const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+    const newBallsRef = useRef<{ id: number, birth: number }[]>([]);
     const [stressText, setStressText] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCooldown, setIsCooldown] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    // New UI State (v1)
+    const [newBallTags, setNewBallTags] = useState<{ id: number, x: number, y: number, opacity: number }[]>([]);
+    const [hasThrownOnce, setHasThrownOnce] = useState(false);
+    const [showProductsGuide, setShowProductsGuide] = useState(false);
+    const [backgroundLightness, setBackgroundLightness] = useState(1.0); // 1.0 = normal, < 1.0 = light/slow
+    const lightnessRef = useRef(1.0);
+    useEffect(() => { lightnessRef.current = backgroundLightness; }, [backgroundLightness]);
 
     const handleThrow = useCallback(async () => {
         if (!physicsRef.current || !imeshRef.current) return;
@@ -312,6 +323,32 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 imeshRef.current.instanceColor!.needsUpdate = true;
                 imeshRef.current.instanceMatrix.needsUpdate = true;
 
+                // --- Effect B: Background Lightness ---
+                setBackgroundLightness(0.5); // Slow down / lighten
+                setTimeout(() => setBackgroundLightness(1.0), 1000); // Duration 1s
+
+                // --- Effect A: Seed Tag Tracking ---
+                newBallsRef.current.push({ id: idx, birth: Date.now() });
+
+                // Flash effect for the new ball
+                // We can't easily flash one instance without custom shader or temporary object.
+                // For now, let's use the color to flash briefly.
+                const flashColor = new THREE.Color("#FFFFFF");
+                imeshRef.current.setColorAt(idx, flashColor);
+                imeshRef.current.instanceColor!.needsUpdate = true;
+                setTimeout(() => {
+                    if (imeshRef.current) {
+                        imeshRef.current.setColorAt(idx, color);
+                        imeshRef.current.instanceColor!.needsUpdate = true;
+                    }
+                }, 350);
+
+                // --- Effect C: Products Guide ---
+                if (!hasThrownOnce) {
+                    setHasThrownOnce(true);
+                    setTimeout(() => setShowProductsGuide(true), 2500);
+                }
+
                 // Send GA4 Event
                 sendGAEvent({ event: "throw_stress", params: { source: "hero" } });
 
@@ -357,6 +394,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
         camera.position.z = 20;
+        cameraRef.current = camera;
 
         const geometry = new THREE.SphereGeometry(1, 32, 32);
         const material = new PhysicalScatteringMaterial({
@@ -453,7 +491,39 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         const animate = () => {
             const delta = clock.getDelta();
-            physics.update(Math.min(delta, 0.1));
+
+            // Adjust physics delta for "Lightness" effect
+            physics.update(Math.min(delta * lightnessRef.current, 0.1));
+
+            // Update New Ball Tags (2D Projection)
+            if (newBallsRef.current.length > 0) {
+                const now = Date.now();
+                const tags: any[] = [];
+                newBallsRef.current = newBallsRef.current.filter(b => {
+                    const age = now - b.birth;
+                    if (age > 12000) return false; // Max 12s
+
+                    if (age > 500) { // Show after 0.5s
+                        const pos = new THREE.Vector3().fromArray(physics.positionData, b.id * 3);
+                        pos.project(camera);
+
+                        const x = (pos.x * 0.5 + 0.5) * parent.offsetWidth;
+                        const y = (-pos.y * 0.5 + 0.5) * parent.offsetHeight;
+
+                        // Opacity fade out
+                        let opacity = 1.0;
+                        if (age > 8000) {
+                            opacity = 1.0 - (age - 8000) / 4000;
+                        }
+
+                        tags.push({ id: b.id, x, y, opacity });
+                    }
+                    return true;
+                });
+                setNewBallTags(tags);
+            } else if (newBallTags.length > 0) {
+                setNewBallTags([]);
+            }
 
             for (let i = 0; i < maxCount; i++) {
                 const dummy = new THREE.Object3D();
@@ -505,38 +575,45 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <div className="w-full max-w-lg px-6 flex flex-col items-center gap-6">
 
                     {/* Headers */}
-                    <div className="text-center space-y-2 pointer-events-auto">
-                        <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-                            ストレスボールを投げる
+                    <div className="text-center space-y-4 pointer-events-auto">
+                        <h1 className="text-4xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-b from-gray-900 via-gray-800 to-gray-600 leading-tight">
+                            内面の重力を、<br className="md:hidden" />投げて軽くする。
                         </h1>
-                        <p className="text-gray-500 text-lg">
-                            感じるストレスをボールに込めて投げてみよう
-                        </p>
+                        <div className="max-w-md mx-auto space-y-2">
+                            <p className="text-gray-500 text-base md:text-lg leading-relaxed">
+                                迷いも、希望も、言葉にならない違和感も。<br />
+                                抱えたままでは重たいものを、ここに投げてください。
+                            </p>
+                            <p className="text-gray-400 text-sm italic">
+                                すぐに答えは出なくても、少し軽くなる。<br />
+                                そしてその重力は、いつか「解決に向かう形」に変わるかもしれません。
+                            </p>
+                        </div>
                     </div>
 
                     {/* Input Area */}
-                    <div className="w-full flex flex-col gap-2">
-                        <div className="w-full bg-white/80 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-white/50 flex gap-2 pointer-events-auto transition-transform hover:scale-[1.01]">
+                    <div className="w-full flex flex-col gap-2 relative">
+                        <div className="w-full bg-white/90 backdrop-blur-lg p-2 rounded-3xl shadow-2xl border border-white/50 flex gap-2 pointer-events-auto transition-all hover:shadow-blue-500/5 group">
                             <textarea
                                 value={stressText}
                                 onChange={(e) => {
                                     setStressText(e.target.value);
                                     if (errorMessage) setErrorMessage(null);
                                 }}
-                                placeholder="ここにストレスを書き込む..."
-                                className="flex-1 bg-transparent border-none outline-none resize-none h-14 p-3 text-gray-700 placeholder:text-gray-400"
+                                placeholder="いま重たく感じていることを書いてください&#10;（あとで形に変えられます）"
+                                className="flex-1 bg-transparent border-none outline-none resize-none h-16 p-4 text-gray-700 placeholder:text-gray-400 leading-snug"
                                 disabled={isSubmitting}
                             />
                             <button
                                 onClick={handleThrow}
                                 disabled={isSubmitting || isCooldown}
-                                className={`self-end px-6 py-3 font-semibold rounded-xl transition-all flex items-center gap-2 shadow-sm ${isSubmitting || isCooldown
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white"
+                                className={`self-end mb-2 mr-2 px-8 py-4 font-bold rounded-2xl transition-all flex items-center gap-2 shadow-lg ${isSubmitting || isCooldown
+                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                    : "bg-gray-900 hover:bg-blue-600 active:bg-blue-700 text-white hover:-translate-y-0.5"
                                     }`}
                             >
-                                <Send className={`w-4 h-4 ${isSubmitting ? "animate-pulse" : ""}`} />
-                                <span>{isCooldown ? "充填中..." : "投げる"}</span>
+                                <Send className={`w-5 h-5 ${isSubmitting ? "animate-pulse" : ""}`} />
+                                <span className="tracking-widest">{isCooldown ? "充填中" : "投げる"}</span>
                             </button>
                         </div>
 
@@ -555,6 +632,45 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         </div>
                     </div>
                 </div>
+
+                {/* Effect A: Seed Tags (2D Overlay) */}
+                <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+                    {newBallTags.map(tag => (
+                        <div
+                            key={tag.id}
+                            style={{
+                                left: tag.x,
+                                top: tag.y,
+                                opacity: tag.opacity,
+                                transform: 'translate(-50%, -120%)'
+                            }}
+                            className="absolute bg-white/40 backdrop-blur-sm border border-white/20 px-2 py-0.5 rounded text-[10px] text-gray-500/80 font-bold tracking-tighter"
+                        >
+                            種
+                        </div>
+                    ))}
+                </div>
+
+                {/* Effect C: Products Guide */}
+                {showProductsGuide && (
+                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                        <button
+                            onClick={() => {
+                                document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            className="flex flex-col items-center gap-2 pointer-events-auto group animate-in fade-in slide-in-from-bottom-4 duration-1000"
+                        >
+                            <span className="text-gray-400 text-sm font-medium group-hover:text-blue-500 transition-colors">
+                                種を、形にする道具を見る ↓
+                            </span>
+                            <div className="animate-bounce text-gray-300 group-hover:text-blue-400">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

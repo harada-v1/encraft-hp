@@ -65,7 +65,10 @@ export default async function Home() {
                                 <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
                                     <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                                 </div>
-                                <h3 className="text-2xl font-bold text-gray-900">Idea Stocker</h3>
+                                <div className="space-y-2">
+                                    <span className="text-[10px] text-blue-600/60 font-bold tracking-widest uppercase block ml-1">Behavior / 判断</span>
+                                    <h3 className="text-2xl font-bold text-gray-900">Idea Stocker</h3>
+                                </div>
                                 <p className="text-gray-600 text-sm leading-relaxed">
                                     重力をアイデアへ変換し、AIがあなたの思考の壁打ち相手になる。未整理の断片から、次のアクションを導き出します。
                                 </p>
@@ -81,7 +84,10 @@ export default async function Home() {
                                 <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600">
                                     <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                                 </div>
-                                <h3 className="text-2xl font-bold text-gray-900">Story Stocker</h3>
+                                <div className="space-y-2">
+                                    <span className="text-[10px] text-purple-600/60 font-bold tracking-widest uppercase block ml-1">Review / 振り返り</span>
+                                    <h3 className="text-2xl font-bold text-gray-900">Story Stocker</h3>
+                                </div>
                                 <p className="text-gray-600 text-sm leading-relaxed">
                                     膨大な思考の断片から、一つの「物語」を紡ぎ出す。クリエイターのための次世代プロット・執筆支援ツール。
                                 </p>
@@ -160,10 +166,10 @@ export default async function Home() {
                         </p>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Section 5: FAQ */}
-            <section id="faq" className="w-full py-24 bg-white">
+            < section id="faq" className="w-full py-24 bg-white" >
                 <div className="max-w-3xl mx-auto px-6 space-y-12">
                     <h2 className="text-3xl font-bold text-center text-gray-900">よくあるご質問</h2>
                     <div className="space-y-8">
@@ -181,10 +187,10 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Footer */}
-            <footer className="w-full py-20 bg-gray-50 border-t border-gray-100">
+            < footer className="w-full py-20 bg-gray-50 border-t border-gray-100" >
                 <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="space-y-2 text-center md:text-left">
                         <h4 className="text-xl font-bold text-gray-900 tracking-tight">Antigravity Inc.</h4>
@@ -197,7 +203,7 @@ export default async function Home() {
                     </div>
                     <p className="text-xs text-gray-400">© 2026 Antigravity Inc. All rights reserved.</p>
                 </div>
-            </footer>
-        </main>
+            </footer >
+        </main >
     );
 }

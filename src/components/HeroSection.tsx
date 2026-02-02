@@ -6,6 +6,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { gsap } from 'gsap';
 import { Send } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { sendGAEvent } from '@next/third-parties/google';
 
 // --- Custom Material (Same as Phase A) ---
 class PhysicalScatteringMaterial extends THREE.MeshPhysicalMaterial {
@@ -246,47 +247,91 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     const physicsRef = useRef<PhysicsWorld | null>(null);
     const imeshRef = useRef<THREE.InstancedMesh | null>(null);
     const [stressText, setStressText] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isCooldown, setIsCooldown] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleThrow = useCallback(async () => {
         if (!physicsRef.current || !imeshRef.current) return;
-        if (!stressText.trim()) return;
+        if (isSubmitting || isCooldown) return;
 
-        // Insert into Supabase
-        const seed = Math.floor(Math.random() * 1_000_000_000);
-        const { error } = await supabase.from('stress_balls').insert({
-            text: stressText,
-            seed: seed
-        });
+        const trimmedText = stressText.trim();
 
-        if (error) {
-            console.error('Error throwing ball:', error);
-            // Optional: Show UI error
+        // Front-end Validation
+        if (!trimmedText) {
+            setErrorMessage("内容を入力してください");
+            return;
+        }
+        if (trimmedText.length > 500) {
+            setErrorMessage("文字数が多すぎます");
             return;
         }
 
-        // Add logic
-        const maxY = physicsRef.current.config.maxY || 5;
-        const idx = physicsRef.current.addBall(maxY);
+        setErrorMessage(null);
+        setIsSubmitting(true);
 
-        if (idx !== -1 && imeshRef.current) {
-            const dummy = new THREE.Object3D();
-            const threeColors = colors.map(c => new THREE.Color(c));
-            // Use seed for consistency if wanted, but random is fine for visual here
-            const color = threeColors[Math.floor(Math.random() * threeColors.length)];
+        try {
+            // Throw via RPC
+            const { data, error } = await supabase.rpc("throw_stress_ball", {
+                p_text: trimmedText
+            });
 
-            imeshRef.current.setColorAt(idx, color);
-            // Position will be updated in next frame by physics update
-            dummy.scale.setScalar(physicsRef.current.sizeData[idx]);
-            dummy.position.fromArray(physicsRef.current.positionData, idx * 3);
-            dummy.updateMatrix();
-            imeshRef.current.setMatrixAt(idx, dummy.matrix);
-            imeshRef.current.instanceColor!.needsUpdate = true;
-            imeshRef.current.instanceMatrix.needsUpdate = true;
+            // returns table -> data is array. Success if error is null and data has items.
+            if (error || !data || (Array.isArray(data) && data.length === 0)) {
+                console.error('Error throwing ball:', error);
 
-            // Reset text (simulating sending)
-            setStressText("");
+                // Handle specific error messages from PostgreSQL
+                const msg = error?.message || "";
+                if (msg.includes("text_required")) {
+                    setErrorMessage("内容を入力してください");
+                } else if (msg.includes("text_too_long")) {
+                    setErrorMessage("文字数が多すぎます");
+                } else if (msg.includes("rate_limited")) {
+                    setErrorMessage("少し時間を置いてください");
+                } else {
+                    setErrorMessage("送信に失敗しました。少し時間を置いて再度お試しください。");
+                }
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Success Behavior
+            const maxY = physicsRef.current.config.maxY || 5;
+            const idx = physicsRef.current.addBall(maxY);
+
+            if (idx !== -1 && imeshRef.current) {
+                const dummy = new THREE.Object3D();
+                const threeColors = colors.map(c => new THREE.Color(c));
+                const color = threeColors[Math.floor(Math.random() * threeColors.length)];
+
+                imeshRef.current.setColorAt(idx, color);
+                dummy.scale.setScalar(physicsRef.current.sizeData[idx]);
+                dummy.position.fromArray(physicsRef.current.positionData, idx * 3);
+                dummy.updateMatrix();
+                imeshRef.current.setMatrixAt(idx, dummy.matrix);
+                imeshRef.current.instanceColor!.needsUpdate = true;
+                imeshRef.current.instanceMatrix.needsUpdate = true;
+
+                // Send GA4 Event
+                sendGAEvent({ event: "throw_stress", params: { source: "hero" } });
+
+                // Reset text
+                setStressText("");
+            }
+
+            // Start Cooldown (3 seconds)
+            setIsCooldown(true);
+            setTimeout(() => {
+                setIsCooldown(false);
+            }, 3000);
+
+        } catch (err) {
+            console.error('Unexpected error throwing ball:', err);
+            setErrorMessage("予期せぬエラーが発生しました。");
+        } finally {
+            setIsSubmitting(false);
         }
-    }, [colors, stressText]);
+    }, [colors, stressText, isSubmitting, isCooldown]);
 
     useEffect(() => {
         if (!canvasRef.current || !containerRef.current) return;
@@ -470,20 +515,44 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     </div>
 
                     {/* Input Area */}
-                    <div className="w-full bg-white/80 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-white/50 flex gap-2 pointer-events-auto transition-transform hover:scale-[1.01]">
-                        <textarea
-                            value={stressText}
-                            onChange={(e) => setStressText(e.target.value)}
-                            placeholder="ここにストレスを書き込む..."
-                            className="flex-1 bg-transparent border-none outline-none resize-none h-14 p-3 text-gray-700 placeholder:text-gray-400"
-                        />
-                        <button
-                            onClick={handleThrow}
-                            className="self-end px-6 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl transition-colors flex items-center gap-2 shadow-sm"
-                        >
-                            <Send className="w-4 h-4" />
-                            <span>投げる</span>
-                        </button>
+                    <div className="w-full flex flex-col gap-2">
+                        <div className="w-full bg-white/80 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-white/50 flex gap-2 pointer-events-auto transition-transform hover:scale-[1.01]">
+                            <textarea
+                                value={stressText}
+                                onChange={(e) => {
+                                    setStressText(e.target.value);
+                                    if (errorMessage) setErrorMessage(null);
+                                }}
+                                placeholder="ここにストレスを書き込む..."
+                                className="flex-1 bg-transparent border-none outline-none resize-none h-14 p-3 text-gray-700 placeholder:text-gray-400"
+                                disabled={isSubmitting}
+                            />
+                            <button
+                                onClick={handleThrow}
+                                disabled={isSubmitting || isCooldown}
+                                className={`self-end px-6 py-3 font-semibold rounded-xl transition-all flex items-center gap-2 shadow-sm ${isSubmitting || isCooldown
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white"
+                                    }`}
+                            >
+                                <Send className={`w-4 h-4 ${isSubmitting ? "animate-pulse" : ""}`} />
+                                <span>{isCooldown ? "充填中..." : "投げる"}</span>
+                            </button>
+                        </div>
+
+                        {/* Error Message */}
+                        {errorMessage && (
+                            <div className="px-4 py-2 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm font-medium animate-in fade-in slide-in-from-top-1">
+                                {errorMessage}
+                            </div>
+                        )}
+
+                        {/* Character Count */}
+                        <div className="flex justify-end px-2">
+                            <span className={`text-xs ${stressText.length > 500 ? "text-red-500 font-bold" : "text-gray-400"}`}>
+                                {stressText.length} / 500
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

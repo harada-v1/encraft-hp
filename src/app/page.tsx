@@ -5,13 +5,16 @@ import { supabaseServer } from '@/lib/supabase-server';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-    // Fetch count from Supabase
-    const { count } = await supabaseServer
-        .from('stress_balls')
-        .select('*', { count: 'exact', head: true });
+    // Fetch count from Supabase via RPC
+    const { data: count, error } = await supabaseServer
+        .rpc('get_stress_ball_count');
+
+    if (error) {
+        console.error('Error fetching stress ball count:', error);
+    }
 
     // Calculate initial count: 80 (base) + count (db), max 300
-    const dbCount = count || 0;
+    const dbCount = Number(count) || 0;
     const initialCount = Math.min(80 + dbCount, 300);
 
     return (

@@ -67,7 +67,7 @@ export default async function Home() {
                                 </div>
                                 <h3 className="text-2xl font-bold text-gray-900">Idea Stocker</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">
-                                    ストレスをアイデアへ変換し、AIがあなたの思考の壁打ち相手になる。未整理の断片から、次のアクションを導き出します。
+                                    重力をアイデアへ変換し、AIがあなたの思考の壁打ち相手になる。未整理の断片から、次のアクションを導き出します。
                                 </p>
                                 <div className="pt-4 flex items-center text-blue-600 font-semibold group-hover:translate-x-2 transition-transform">
                                     使ってみる →

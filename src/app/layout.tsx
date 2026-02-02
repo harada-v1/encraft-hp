@@ -19,15 +19,16 @@ export const metadata: Metadata = {
 
 import { GoogleAnalytics } from '@next/third-parties/google';
 
+const gaId = process.env.NEXT_PUBLIC_GA4_ID ?? "";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const gaId = process.env.NEXT_PUBLIC_GA4_ID ?? "";
   const isDev = process.env.NODE_ENV === 'development';
 
-  if (isDev && gaId) {
+  if (isDev && gaId !== "") {
     console.log("GA4 enabled:", gaId);
   }
 

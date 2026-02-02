@@ -324,7 +324,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 imeshRef.current.instanceMatrix.needsUpdate = true;
 
                 // --- Effect B: Background Lightness ---
-                setBackgroundLightness(0.5); // Slow down / lighten
+                setBackgroundLightness(0.9); // Subtle slowdown (90%)
                 setTimeout(() => setBackgroundLightness(1.0), 1000); // Duration 1s
 
                 // --- Effect A: Seed Tag Tracking ---
@@ -350,7 +350,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 }
 
                 // Send GA4 Event
-                sendGAEvent({ event: "throw_stress", params: { source: "hero" } });
+                sendGAEvent({ event: "throw_gravity", params: { source: "hero" } });
 
                 // Reset text
                 setStressText("");
@@ -492,8 +492,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         const animate = () => {
             const delta = clock.getDelta();
 
-            // Adjust physics delta for "Lightness" effect
-            physics.update(Math.min(delta * lightnessRef.current, 0.1));
+            // Apply background lightness (slowdown) & upward drift
+            const speedFactor = lightnessRef.current;
+            const currentDelta = Math.min(delta * speedFactor, 0.1);
+
+            // If speedFactor < 1 (active effect), slightly decrease gravity to feel lighter
+            if (speedFactor < 1.0) {
+                const originalGravity = physics.config.gravity ?? 0.5;
+                physics.config.gravity = originalGravity * 0.5; // Half gravity temporarily
+                physics.update(currentDelta);
+                physics.config.gravity = originalGravity; // Restore
+            } else {
+                physics.update(currentDelta);
+            }
 
             // Update New Ball Tags (2D Projection)
             if (newBallsRef.current.length > 0) {

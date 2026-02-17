@@ -1,12 +1,63 @@
 import React from 'react';
 import { HeroSection } from '@/components/HeroSection';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/utils/supabase/server';
+import { ProfileCompletionModal } from '@/components/ProfileCompletionModal';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { buildStoryRedirectUrl } from '@/lib/auth-utils';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Home() {
+interface HomeProps {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+    const params = await searchParams;
+    let showProfileSetup = params.profile_setup === '1';
+    const queryReturnTo = params.return_to as string | undefined;
+
+    const cookieStore = await cookies();
+    const cookieReturnTo = cookieStore.get('hub_return_to')?.value;
+
+    const returnTo = queryReturnTo || cookieReturnTo;
+
+    const supabaseServerClient = await createClient();
+    const { data: { user } } = await supabaseServerClient.auth.getUser();
+
+    if (user) {
+        // 地雷対策①: profiles行の存在保証 (upsert)
+        // 既存行があっても user_id が一致するので競合せず、なければ作成される
+        await supabaseServerClient
+            .from('profiles')
+            .upsert({ user_id: user.id }, { onConflict: 'user_id' });
+
+        // 年齢/性別の未入力チェック
+        const { data: profile } = await supabaseServerClient
+            .from('profiles')
+            .select('age_range, gender')
+            .eq('user_id', user.id)
+            .single();
+
+        if (!profile?.age_range || !profile?.gender) {
+            showProfileSetup = true;
+        } else if (profile.age_range && profile.gender) {
+            // 入力済みの場合のみ、return_to または profile_setup=1 に応じた処理を行う
+            if (showProfileSetup || queryReturnTo) {
+                if (queryReturnTo) {
+                    // Story 側への復帰（buildStoryRedirectUrl は絶対URLを返す）
+                    redirect(buildStoryRedirectUrl(returnTo || '/'));
+                } else {
+                    // Hub 自体で完結させる場合や return_to がない場合
+                    redirect('/');
+                }
+            }
+            showProfileSetup = false;
+        }
+    }
+
     // Fetch count from Supabase via RPC
-    const { data: count, error } = await supabaseServer
+    const { data: count, error } = await supabaseServerClient
         .rpc('get_stress_ball_count');
 
     if (error) {
@@ -19,6 +70,7 @@ export default async function Home() {
 
     return (
         <main className="w-full min-h-screen bg-white">
+            {showProfileSetup && <ProfileCompletionModal returnTo={returnTo} />}
             {/* Hero Section */}
             <HeroSection
                 initialCount={initialCount}

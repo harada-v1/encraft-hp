@@ -13,27 +13,41 @@ function SignupContent() {
     const searchParams = useSearchParams();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
 
     const returnTo = searchParams.get('return_to');
 
-    const handleOAuthLogin = async (provider: 'google' | 'github') => {
+    const handleOAuthLogin = async (provider: 'google') => {
         const validatedPath = validateReturnTo(returnTo);
-        // redirectTo に Hub 側のコールバックを明示的に指定
-        const redirectTo = `${window.location.origin}/auth/callback?return_to=${encodeURIComponent(validatedPath)}`;
+        const hubOrigin = window.location.origin;
+        const redirectTo = `${hubOrigin}/auth/callback?return_to=${encodeURIComponent(validatedPath)}`;
 
-        await supabase.auth.signInWithOAuth({
+        const supabase = createClient();
+        const { error } = await supabase.auth.signInWithOAuth({
             provider,
             options: {
                 redirectTo,
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'consent',
+                },
             },
         });
+
+        if (error) setError(error.message);
     };
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (password !== confirmPassword) {
+            setError('パスワードが一致しません。');
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
@@ -57,7 +71,6 @@ function SignupContent() {
                 setIsSuccess(true);
                 setLoading(false);
             }
-            // 成功時にセッションが確立された場合は Server Action 内で redirect される
         } catch (err) {
             if (err instanceof Error && err.message === 'NEXT_REDIRECT') {
                 return;
@@ -71,26 +84,26 @@ function SignupContent() {
     if (isSuccess) {
         return (
             <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
-                <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 z-0 text-center">
                     <BallpitBackground />
                 </div>
                 <div className="w-full max-w-md z-10">
-                    <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-white/50 p-10 text-center space-y-6">
-                        <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto shadow-sm">
-                            <CheckCircle2 className="text-green-500 w-10 h-10" />
+                    <div className="bg-white/70 backdrop-blur-2xl rounded-[3rem] shadow-2xl border border-white/50 p-10 text-center space-y-8">
+                        <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                            <CheckCircle2 className="text-green-500 w-12 h-12" />
                         </div>
-                        <div className="space-y-2">
-                            <h1 className="text-2xl font-bold text-gray-900">メールを送信しました</h1>
-                            <p className="text-gray-500 text-sm leading-relaxed">
-                                {email} 宛に確認メールを送信しました。<br />
-                                メール内のリンクをクリックして登録を完了してください。
+                        <div className="space-y-3">
+                            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">メールを送信しました</h1>
+                            <p className="text-gray-500 text-sm leading-relaxed font-medium">
+                                <span className="text-gray-900 font-bold">{email}</span> 宛に確認メールを送信しました。<br />
+                                記載されたリンクをクリックして登録を完了してください。
                             </p>
                         </div>
                         <button
                             onClick={() => router.push('/login')}
-                            className="w-full bg-gray-900 text-white rounded-2xl py-4 font-bold shadow-lg hover:bg-blue-600 transition-all"
+                            className="w-full bg-gray-900 text-white rounded-2xl py-4 font-bold shadow-lg hover:bg-black transition-all active:scale-[0.98]"
                         >
-                            ログイン画面へ
+                            ログイン画面へ戻る
                         </button>
                     </div>
                 </div>
@@ -100,20 +113,21 @@ function SignupContent() {
 
     return (
         <div className="w-full h-full flex items-center justify-center p-4 relative overflow-hidden">
-
             <div className="w-full max-w-md z-10">
                 <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-white/50 p-8 md:p-10">
-                    <div className="flex flex-col items-center mb-8">
-                        <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
-                            <UserPlus className="text-white w-8 h-8" />
+                    <div className="flex flex-col items-center mb-8 space-y-3">
+                        <div className="w-20 h-20 bg-gray-900 rounded-3xl flex items-center justify-center shadow-2xl shadow-black/10">
+                            <UserPlus className="text-white w-10 h-10" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">アカウント作成</h1>
-                        <p className="text-gray-500 text-sm mt-1">Antigravity Account Hub</p>
+                        <div className="text-center">
+                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Join Hub</h1>
+                            <p className="text-gray-500 text-sm font-medium mt-1">Antigravity 共通アカウントを作成</p>
+                        </div>
                     </div>
 
-                    <form onSubmit={handleSignup} className="space-y-5">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Email</label>
+                    <form onSubmit={handleSignup} className="space-y-4">
+                        <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email</label>
                             <div className="relative group">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                                 <input
@@ -121,14 +135,14 @@ function SignupContent() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-white/50 border border-gray-200 rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    className="w-full bg-white/50 border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900"
                                     placeholder="name@example.com"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Password</label>
+                        <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">Password</label>
                             <div className="relative group">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                                 <input
@@ -136,8 +150,24 @@ function SignupContent() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-white/50 border border-gray-200 rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    className="w-full bg-white/50 border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900"
                                     placeholder="6文字以上"
+                                    minLength={6}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">Confirm Password</label>
+                            <div className="relative group">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                                <input
+                                    type="password"
+                                    required
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full bg-white/50 border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900"
+                                    placeholder="パスワードを再入力"
                                     minLength={6}
                                 />
                             </div>
@@ -146,33 +176,31 @@ function SignupContent() {
                         {error && (
                             <div className="bg-red-50 border border-red-100 rounded-xl p-4 flex gap-3 animate-in fade-in slide-in-from-top-2">
                                 <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
-                                <p className="text-sm text-red-600 font-medium">{error}</p>
+                                <p className="text-sm text-red-600 font-bold">{error}</p>
                             </div>
                         )}
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-blue-600 text-white rounded-2xl py-4 font-bold shadow-lg shadow-blue-500/10 hover:bg-blue-700 active:scale-[0.98] transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:scale-100 flex items-center justify-center gap-2"
+                            className="w-full bg-gray-900 text-white rounded-2xl py-4 font-bold shadow-lg shadow-black/10 hover:bg-black active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "アカウントを作成"}
                         </button>
 
-                        {/* Divider */}
-                        <div className="relative py-4">
+                        <div className="relative py-2">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-gray-100"></div>
                             </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-white/70 px-4 text-gray-400 font-bold tracking-widest backdrop-blur-xl rounded-full">Or</span>
+                            <div className="relative flex justify-center text-[10px] uppercase">
+                                <span className="bg-white/70 px-4 text-gray-400 font-bold tracking-widest backdrop-blur-xl rounded-full">Or continue with</span>
                             </div>
                         </div>
 
-                        {/* Google Login Button */}
                         <button
                             type="button"
                             onClick={() => handleOAuthLogin('google')}
-                            className="w-full bg-white border border-gray-200 text-gray-700 rounded-2xl py-4 font-bold shadow-sm hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                            className="w-full bg-white border border-gray-200 text-gray-700 rounded-2xl py-3.5 font-bold shadow-sm hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path
@@ -192,16 +220,16 @@ function SignupContent() {
                                     fill="#EA4335"
                                 />
                             </svg>
-                            Googleで継続
+                            <span>Googleで登録</span>
                         </button>
                     </form>
 
-                    <div className="mt-8 pt-8 border-t border-gray-100 text-center">
-                        <p className="text-gray-500 text-sm">
+                    <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                        <p className="text-gray-500 text-sm font-medium">
                             すでにアカウントをお持ちですか？{" "}
                             <button
                                 onClick={() => router.push(`/login?return_to=${encodeURIComponent(returnTo || '/')}`)}
-                                className="text-blue-600 font-bold hover:underline"
+                                className="text-blue-600 font-bold hover:underline underline-offset-4"
                             >
                                 ログイン
                             </button>

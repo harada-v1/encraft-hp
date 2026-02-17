@@ -6,15 +6,19 @@ import { createClient } from '@/utils/supabase/client';
 import { BallpitBackground } from '@/components/BallpitBackground';
 import { Loader2 } from 'lucide-react';
 
+import { signIn } from '@/app/auth/actions';
+import { Mail, Lock, UserPlus, ArrowRight } from 'lucide-react';
+
 function LoginContent() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     // return_to の取得と検証
     const rawReturnTo = searchParams.get('return_to');
-
-    // オープンリダイレクト対策: / で始まる相対パス以外は / にフォールバック
     const validatedReturnTo = (rawReturnTo?.startsWith('/') && !rawReturnTo.startsWith('//'))
         ? rawReturnTo
         : '/';
@@ -24,8 +28,6 @@ function LoginContent() {
         setErrorMessage(null);
 
         const supabase = createClient();
-
-        // コールバックURLの構築
         const hubOrigin = window.location.origin;
         const redirectTo = `${hubOrigin}/auth/callback?return_to=${encodeURIComponent(validatedReturnTo)}`;
 
@@ -46,19 +48,106 @@ function LoginContent() {
         }
     };
 
+    const handleEmailLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setErrorMessage(null);
+
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('return_to', validatedReturnTo);
+
+        try {
+            const result = await signIn(formData);
+            if (result?.error) {
+                setErrorMessage(result.error);
+                setIsLoading(false);
+            }
+        } catch (err) {
+            console.error(err);
+            setErrorMessage('ログイン中に予期せぬエラーが発生しました。');
+            setIsLoading(false);
+        }
+    };
+
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center p-4 relative z-10 text-center space-y-8">
-            <div className="bg-white/70 backdrop-blur-2xl rounded-3xl p-10 shadow-2xl border border-white/50 flex flex-col items-center space-y-8 min-w-[320px] max-w-md">
+        <div className="w-full h-full flex flex-col items-center justify-center p-4 relative z-10 text-center space-y-6">
+            <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-white/50 flex flex-col items-center space-y-6 min-w-[320px] max-w-md w-full">
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Login to Hub</h1>
-                    <p className="text-sm text-gray-500">Antigravity 共通アカウントでログイン</p>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Login to Hub</h1>
+                    <p className="text-sm text-gray-500 font-medium">Antigravity 共通アカウントでログイン</p>
                 </div>
 
-                <div className="w-full space-y-4">
+                <form onSubmit={handleEmailLogin} className="w-full space-y-4 text-left">
+                    <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email</label>
+                        <div className="relative group">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                            <input
+                                type="email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full bg-white/50 border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900"
+                                placeholder="name@example.com"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <div className="flex justify-between items-center ml-1">
+                            <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Password</label>
+                            <button
+                                type="button"
+                                onClick={() => router.push(`/forgot-password?return_to=${encodeURIComponent(validatedReturnTo)}`)}
+                                className="text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                            >
+                                Forgot?
+                            </button>
+                        </div>
+                        <div className="relative group">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                            <input
+                                type="password"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full bg-white/50 border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900"
+                                placeholder="••••••••"
+                            />
+                        </div>
+                    </div>
+
                     <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full bg-gray-900 text-white rounded-2xl py-4 font-bold shadow-lg hover:bg-black active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                        {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                            <>
+                                <span>ログイン</span>
+                                <ArrowRight className="w-4 h-4" />
+                            </>
+                        )}
+                    </button>
+                </form>
+
+                <div className="w-full relative py-2">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-100"></div>
+                    </div>
+                    <div className="relative flex justify-center text-[10px] uppercase">
+                        <span className="bg-white/70 px-4 text-gray-400 font-bold tracking-widest backdrop-blur-xl rounded-full">Or continue with</span>
+                    </div>
+                </div>
+
+                <div className="w-full">
+                    <button
+                        type="button"
                         onClick={handleGoogleLogin}
                         disabled={isLoading}
-                        className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3.5 px-6 rounded-2xl border border-gray-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+                        className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3.5 px-6 rounded-2xl border border-gray-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 group mt-2"
                     >
                         {isLoading ? (
                             <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
@@ -86,14 +175,27 @@ function LoginContent() {
                     </button>
 
                     {errorMessage && (
-                        <p className="text-xs text-red-500 font-medium animate-in fade-in slide-in-from-top-1">
+                        <p className="text-xs text-red-500 font-bold mt-4 animate-in fade-in slide-in-from-top-1 px-2">
                             {errorMessage}
                         </p>
                     )}
                 </div>
 
+                <div className="pt-2">
+                    <p className="text-sm text-gray-500 font-medium">
+                        アカウントをお持ちでないですか？{' '}
+                        <button
+                            type="button"
+                            onClick={() => router.push(`/signup?return_to=${encodeURIComponent(validatedReturnTo)}`)}
+                            className="text-blue-600 font-bold hover:underline underline-offset-4"
+                        >
+                            新規登録
+                        </button>
+                    </p>
+                </div>
+
                 <div className="pt-4">
-                    <p className="text-[10px] text-gray-400 leading-relaxed">
+                    <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
                         ログインすることで、利用規約およびプライバシーポリシーに<br />
                         同意したものとみなされます。
                     </p>
@@ -102,9 +204,10 @@ function LoginContent() {
 
             <button
                 onClick={() => window.location.href = '/'}
-                className="text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors"
+                className="text-gray-400 hover:text-gray-600 text-sm font-bold transition-colors flex items-center gap-2 group"
             >
-                ← トップページに戻る
+                <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                <span>トップページに戻る</span>
             </button>
         </div>
     );

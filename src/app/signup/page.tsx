@@ -185,7 +185,11 @@ function SignupContent() {
                         {error && (
                             <div className="bg-red-50 border border-red-100 rounded-xl p-4 flex gap-3 animate-in fade-in slide-in-from-top-2">
                                 <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
-                                <p className="text-sm text-red-600 font-bold">{error}</p>
+                                <p className="text-sm text-red-600 font-bold">
+                                    {error === 'email rate limit exceeded'
+                                        ? '短時間に複数回送信されたため、一時的に制限されています。数分待ってから再度お試しください。'
+                                        : error}
+                                </p>
                             </div>
                         )}
 

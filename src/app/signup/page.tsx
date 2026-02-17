@@ -125,12 +125,9 @@ function SignupContent() {
         <div className="w-full h-full flex items-center justify-center p-4 relative overflow-hidden">
             <div className="w-full max-w-md z-10">
                 <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-white/50 p-8 md:p-10">
-                    <div className="flex flex-col items-center mb-8 space-y-3">
-                        <div className="w-20 h-20 bg-gray-900 rounded-3xl flex items-center justify-center shadow-2xl shadow-black/10">
-                            <UserPlus className="text-white w-10 h-10" />
-                        </div>
-                        <div className="text-center">
-                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">アカウント作成</h1>
+                    <div className="flex flex-col items-center mb-10">
+                        <div className="w-24 h-24 bg-gray-900 rounded-[2rem] flex items-center justify-center shadow-2xl shadow-black/10 transition-transform hover:scale-105 duration-500">
+                            <UserPlus className="text-white w-12 h-12" />
                         </div>
                     </div>
 

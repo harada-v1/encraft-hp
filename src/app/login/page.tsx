@@ -76,7 +76,6 @@ function LoginContent() {
             <div className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-white/50 flex flex-col items-center space-y-6 min-w-[320px] max-w-md w-full">
                 <div className="space-y-2">
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Login to Hub</h1>
-                    <p className="text-sm text-gray-500 font-medium">Antigravity 共通アカウントでログイン</p>
                 </div>
 
                 <form onSubmit={handleEmailLogin} className="w-full space-y-4 text-left">
@@ -103,7 +102,7 @@ function LoginContent() {
                                 onClick={() => router.push(`/forgot-password?return_to=${encodeURIComponent(validatedReturnTo)}`)}
                                 className="text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors"
                             >
-                                Forgot?
+                                パスワードを忘れた？
                             </button>
                         </div>
                         <div className="relative group">

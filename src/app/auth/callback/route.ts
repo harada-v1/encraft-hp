@@ -11,7 +11,23 @@ export async function GET(request: Request) {
         const supabase = await createClient()
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
+            // プロフィール完了チェック
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('age_range, gender')
+                .single();
+
             const isLocalEnv = process.env.NODE_ENV === 'development'
+            const hubOrigin = process.env.NEXT_PUBLIC_HUB_ORIGIN || origin
+
+            if (!profile?.age_range || !profile?.gender) {
+                // 未完了ならHubのセットアップ画面へ
+                const setupUrl = new URL('/', hubOrigin)
+                setupUrl.searchParams.set('profile_setup', '1')
+                setupUrl.searchParams.set('return_to', next)
+                return NextResponse.redirect(setupUrl.toString())
+            }
+
             if (isLocalEnv) {
                 return NextResponse.redirect(`${origin}${next}`)
             } else {

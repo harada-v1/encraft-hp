@@ -50,7 +50,8 @@ export async function signIn(formData: FormData) {
 
         if (!profile?.age_range || !profile?.gender) {
             // 未完了ならHubのセットアップ画面へ
-            const setupUrl = new URL('/', 'http://localhost:3002') // originは本来動的に取得すべきだがlocal固定か
+            const hubOrigin = process.env.NEXT_PUBLIC_HUB_ORIGIN || 'http://localhost:3002'
+            const setupUrl = new URL('/', hubOrigin)
             setupUrl.searchParams.set('profile_setup', '1')
             setupUrl.searchParams.set('return_to', validatedPath)
             redirect(setupUrl.toString())
@@ -110,7 +111,8 @@ export async function signUp(formData: FormData) {
             }
 
             if (!profile?.age_range || !profile?.gender) {
-                const setupUrl = new URL('/', 'http://localhost:3002')
+                const hubOrigin = process.env.NEXT_PUBLIC_HUB_ORIGIN || 'http://localhost:3002'
+                const setupUrl = new URL('/', hubOrigin)
                 setupUrl.searchParams.set('profile_setup', '1')
                 setupUrl.searchParams.set('return_to', validatedPath)
                 redirect(setupUrl.toString())

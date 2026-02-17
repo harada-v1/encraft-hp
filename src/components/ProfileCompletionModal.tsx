@@ -74,7 +74,7 @@ export const ProfileCompletionModal: React.FC<ProfileCompletionModalProps> = ({ 
         { label: '男性', value: 'male' },
         { label: '女性', value: 'female' },
         { label: 'その他', value: 'other' },
-        { label: '回答しない', value: 'no_answer' },
+        { label: '未回答', value: 'no_answer' },
     ];
 
     return (

@@ -121,7 +121,6 @@ function SignupContent() {
                         </div>
                         <div className="text-center">
                             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Join Hub</h1>
-                            <p className="text-gray-500 text-sm font-medium mt-1">Antigravity 共通アカウントを作成</p>
                         </div>
                     </div>
 

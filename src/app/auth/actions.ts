@@ -85,6 +85,14 @@ export async function signUp(formData: FormData) {
         },
     })
 
+    console.log('[Signup] signUp call result:', {
+        email,
+        redirectTo: emailRedirectTo,
+        userId: data?.user?.id,
+        hasSession: !!data?.session,
+        error: error?.message
+    })
+
     if (error) {
         return { error: error.message }
     }

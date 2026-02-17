@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@next/third-parties": "^16.1.6",
-    "@supabase/supabase-js": "^2.93.3",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.95.3",
     "@types/three": "^0.182.0",
     "gsap": "^3.14.2",
     "lucide-react": "^0.563.0",

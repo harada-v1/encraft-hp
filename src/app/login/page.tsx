@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { BallpitBackground } from '@/components/BallpitBackground';
 import { Loader2 } from 'lucide-react';
@@ -97,13 +98,12 @@ function LoginContent() {
                     <div className="space-y-1.5">
                         <div className="flex justify-between items-center ml-1">
                             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Password</label>
-                            <button
-                                type="button"
-                                onClick={() => router.push(`/forgot-password?return_to=${encodeURIComponent(validatedReturnTo)}`)}
+                            <Link
+                                href={`/forgot-password?return_to=${encodeURIComponent(validatedReturnTo)}`}
                                 className="text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors"
                             >
                                 パスワードを忘れた？
-                            </button>
+                            </Link>
                         </div>
                         <div className="relative group">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />

@@ -93,15 +93,18 @@ function SignupContent() {
                             <CheckCircle2 className="text-green-500 w-12 h-12" />
                         </div>
                         <div className="space-y-4">
-                            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">メールを送信しました</h1>
-                            <div className="space-y-4 px-2">
-                                <p className="text-gray-600 text-[13px] md:text-sm leading-relaxed font-medium break-keep">
-                                    <span className="text-gray-900 font-bold block mb-1">{email}</span>
-                                    宛に確認メールを送信しました。記載されたリンクをクリックして登録を完了してください。
+                            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">確認メールを送信しました</h1>
+                            <div className="space-y-5 px-1">
+                                <p className="text-gray-600 text-sm leading-relaxed font-medium">
+                                    <span className="text-gray-900 font-bold block text-base mb-1">{email}</span>
+                                    宛に、送信元 <span className="text-gray-900 font-bold">「Supabase Auth」</span> より本人確認メールをお送りしました。
                                 </p>
-                                <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
-                                    <p className="text-[11px] text-gray-400 leading-relaxed">
-                                        ※メールが届かない場合は、迷惑メールフォルダをご確認いただくか、入力したメールアドレスが正しいか再度ご確認ください。
+                                <p className="text-gray-600 text-sm leading-relaxed font-medium">
+                                    メール内のリンクをクリックして、アカウント作成を完了してください。
+                                </p>
+                                <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100/50">
+                                    <p className="text-[11px] text-gray-400 leading-relaxed text-left">
+                                        ※メールが届かない場合は、迷惑メールフォルダをご確認いただくか、入力したメールアドレスにお間違いがないか再度ご確認ください。
                                     </p>
                                 </div>
                             </div>

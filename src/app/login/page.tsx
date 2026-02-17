@@ -100,7 +100,7 @@ function LoginContent() {
                             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Password</label>
                             <Link
                                 href={`/forgot-password?return_to=${encodeURIComponent(validatedReturnTo)}`}
-                                className="text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                                className="text-[11px] font-bold text-blue-600 hover:text-blue-500 hover:underline transition-all underline-offset-4"
                             >
                                 パスワードを忘れた？
                             </Link>

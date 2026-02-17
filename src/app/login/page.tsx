@@ -2,8 +2,8 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
-import { BallpitBackground } from '@/components/BallpitBackground';
+import { createClient } from '../../utils/supabase/client';
+import { BallpitBackground } from '../../components/BallpitBackground';
 import { Loader2 } from 'lucide-react';
 
 function LoginContent() {

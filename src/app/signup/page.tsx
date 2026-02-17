@@ -130,7 +130,7 @@ function SignupContent() {
                             <UserPlus className="text-white w-10 h-10" />
                         </div>
                         <div className="text-center">
-                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Join Hub</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">アカウント作成</h1>
                         </div>
                     </div>
 

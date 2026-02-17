@@ -15,7 +15,7 @@ export async function GET(request: Request) {
             if (isLocalEnv) {
                 return NextResponse.redirect(`${origin}${next}`)
             } else {
-                return NextResponse.redirect(`https://hub.ma-encraft.com${next}`)
+                return NextResponse.redirect(`https://story.ma-encraft.com${next}`)
             }
         }
     }

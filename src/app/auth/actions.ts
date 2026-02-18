@@ -150,7 +150,7 @@ export async function forgotPassword(formData: FormData) {
     const protocol = headerList.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : 'http')
     const origin = host ? `${protocol}://${host}` : (process.env.NEXT_PUBLIC_HUB_ORIGIN || 'http://localhost:3002')
 
-    const redirectTo = `${origin}/auth/reset-password?return_to=${encodeURIComponent(returnTo || '/')}`
+    const redirectTo = `${origin}/auth/callback?return_to=${encodeURIComponent(returnTo || '/')}&next=/auth/reset-password`
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo,

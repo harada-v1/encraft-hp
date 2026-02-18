@@ -4,13 +4,19 @@ import { createClient } from '@/utils/supabase/server'
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
     const code = searchParams.get('code')
-    // if "next" is in param, use it as the redirect destination
-    const next = searchParams.get('return_to') ?? '/'
+    const returnTo = searchParams.get('return_to') ?? '/'
+    const next = searchParams.get('next')
 
     if (code) {
         const supabase = await createClient()
         const { error } = await supabase.auth.exchangeCodeForSession(code)
+
         if (!error) {
+            // パスワードリセット等の特定フローの場合は指定ページへ遷移
+            if (next) {
+                return NextResponse.redirect(`${origin}${next}?return_to=${encodeURIComponent(returnTo)}`)
+            }
+
             // プロフィール完了チェック
             const { data: profile } = await supabase
                 .from('profiles')
@@ -24,14 +30,14 @@ export async function GET(request: Request) {
                 // 未完了ならHubのセットアップ画面へ
                 const setupUrl = new URL('/', hubOrigin)
                 setupUrl.searchParams.set('profile_setup', '1')
-                setupUrl.searchParams.set('return_to', next)
+                setupUrl.searchParams.set('return_to', returnTo)
                 return NextResponse.redirect(setupUrl.toString())
             }
 
             if (isLocalEnv) {
-                return NextResponse.redirect(`${origin}${next}`)
+                return NextResponse.redirect(`${origin}${returnTo}`)
             } else {
-                return NextResponse.redirect(`https://story.ma-encraft.com${next}`)
+                return NextResponse.redirect(`https://story.ma-encraft.com${returnTo}`)
             }
         }
     }

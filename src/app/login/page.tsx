@@ -1,3 +1,7 @@
+import MaintenancePage from "../maintenance/page";
+export default MaintenancePage;
+
+/*
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
@@ -229,3 +233,4 @@ export default function LoginPage() {
         </div>
     );
 }
+*/

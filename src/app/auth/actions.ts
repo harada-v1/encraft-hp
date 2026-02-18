@@ -72,9 +72,11 @@ export async function signUp(formData: FormData) {
     const supabase = await createClient()
     const headerList = await headers()
 
+    const host = headerList.get('host')
+    const protocol = headerList.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : 'http')
+    const hubOrigin = host ? `${protocol}://${host}` : (process.env.NEXT_PUBLIC_HUB_ORIGIN || 'http://localhost:3002')
+
     const validatedPath = validateReturnTo(returnTo)
-    // 常に Hub(3002) 側のコールバックを通すように修正
-    const hubOrigin = process.env.NEXT_PUBLIC_HUB_ORIGIN || 'http://localhost:3002'
     const emailRedirectTo = `${hubOrigin}/auth/callback?return_to=${encodeURIComponent(validatedPath)}`
 
     const { data, error } = await supabase.auth.signUp({
